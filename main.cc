@@ -1,23 +1,28 @@
 #include <iostream>
 #include <ncurses.h>
 
-struct AggregatorState
+struct ApplicationState 
 {
+  bool collectingData;
   bool screenChecked;
   bool microphoneChecked;
   bool websiteChecked;
 };
 
 // Function to draw the Aggregator panel
-void drawAggregatorPanel(WINDOW *aggregatorWin, const AggregatorState &state)
+void drawAggregatorPanel(WINDOW *aggregatorWin, const ApplicationState &state)
 {
+  werase(aggregatorWin);
+
   box(aggregatorWin, 0, 0);
-  mvwprintw(aggregatorWin, 1, 2, "Aggregator");
+  mvwprintw(aggregatorWin, 1, 2, "Aggregator: Disabled (d to toggle)");
   mvwprintw(aggregatorWin, 3, 2, "[ ] Screen");
   mvwprintw(aggregatorWin, 4, 2, "[ ] Microphone");
   mvwprintw(aggregatorWin, 5, 2, "[ ] Website");
 
   // Toggle check marks based on state
+  if (state.collectingData)
+    mvwprintw(aggregatorWin, 1, 2, "Aggregator: Collecting (d to toggle)");
   if (state.screenChecked)
     mvwprintw(aggregatorWin, 3, 2, "[X] Screen");
   if (state.microphoneChecked)
@@ -31,6 +36,7 @@ void drawAggregatorPanel(WINDOW *aggregatorWin, const AggregatorState &state)
 // Function to draw the Knowledge Base panel
 void drawKnowledgeBasePanel(WINDOW *knowledgeBaseWin)
 {
+  werase(knowledgeBaseWin);
   box(knowledgeBaseWin, 0, 0);
   mvwprintw(knowledgeBaseWin, 1, 2, "Knowledge Base");
   // Add text or information here
@@ -40,10 +46,16 @@ void drawKnowledgeBasePanel(WINDOW *knowledgeBaseWin)
 // Function to draw the Inference panel
 void drawInferencePanel(WINDOW *inferenceWin)
 {
+  werase(inferenceWin);
   box(inferenceWin, 0, 0);
   mvwprintw(inferenceWin, 1, 2, "Inference");
   // Add content specific to Inference here
   wrefresh(inferenceWin);
+}
+
+void enableDataCollection()
+{
+  return;
 }
 
 int main()
@@ -51,6 +63,8 @@ int main()
   initscr(); // initialize the library
   noecho();  // don't display input characters
   cbreak();  // disable line buffering
+
+  curs_set(0); // hide the cursor
 
   int height, width;
   getmaxyx(stdscr, height, width);
@@ -67,7 +81,7 @@ int main()
   wrefresh(inferenceWin);
 
   // Initialize state
-  AggregatorState state = {false, false, false};
+  ApplicationState state = {false, false, false, false};
 
   // Draw initial content for each panel
   drawAggregatorPanel(aggregatorWin, state);
@@ -77,21 +91,21 @@ int main()
   int ch;
   while ((ch = getch()) != KEY_F(1))
   {
-    // Update state based on user input
-    switch (ch)
-    {
-    case 's':
-      state.screenChecked = !state.screenChecked;
+    switch (ch) {
+    case 'd':
+      if (state.collectingData) {
+        state.collectingData = false;
+        state.screenChecked = false;
+        state.microphoneChecked = false;
+        state.websiteChecked = false;
+      } else {
+        state.collectingData = true;
+        enableDataCollection();
+      }
       break;
-    case 'm':
-      state.microphoneChecked = !state.microphoneChecked;
-      break;
-    case 'w':
-      state.websiteChecked = !state.websiteChecked;
+    default:
       break;
     }
-
-    // Redraw UI based on updated state
     drawAggregatorPanel(aggregatorWin, state);
   }
 
