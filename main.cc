@@ -28,7 +28,7 @@ void drawAggregatorPanel(WINDOW *aggregatorWin, const ApplicationState &state)
 
   // Toggle check marks based on state
   if (state.collectingData)
-    mvwprintw(aggregatorWin, 1, 2, "Aggregator: Collecting (d to toggle)");
+    mvwprintw(aggregatorWin, 1, 2, "Aggregator: Enabled (d to toggle) ");
   if (state.screenChecked)
     mvwprintw(aggregatorWin, 3, 2, "[X] Screen");
   if (state.microphoneChecked)
@@ -66,7 +66,9 @@ void enableDataCollection()
 
 void InitUpdateState() {
   try {
-    screenwhisper_user_config_.readFile("screenwhisper.cfg");
+    // TODO(armanbhalla): Note that the file needs to be 1 folder below
+    // the current directory, to keep things simple.
+    screenwhisper_user_config_.readFile("../screenwhisper.cfg");
   } catch (const libconfig::FileIOException &fioex) {
     std::cerr << "I/O error while reading the configuration file" << std::endl;
     exit(EXIT_FAILURE);
