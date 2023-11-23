@@ -7,6 +7,7 @@ struct ApplicationState
   bool screenChecked;
   bool microphoneChecked;
   bool websiteChecked;
+  int data_collected;
 };
 
 // Function to draw the Aggregator panel
@@ -15,7 +16,9 @@ void drawAggregatorPanel(WINDOW *aggregatorWin, const ApplicationState &state)
   werase(aggregatorWin);
 
   box(aggregatorWin, 0, 0);
+  std::string kb_collected = std::to_string(state.data_collected) + " KB collected";
   mvwprintw(aggregatorWin, 1, 2, "Aggregator: Disabled (d to toggle)");
+  mvwprintw(aggregatorWin, 2, 2, "%s", kb_collected.c_str());
   mvwprintw(aggregatorWin, 3, 2, "[ ] Screen");
   mvwprintw(aggregatorWin, 4, 2, "[ ] Microphone");
   mvwprintw(aggregatorWin, 5, 2, "[ ] Website");
@@ -81,7 +84,7 @@ int main()
   wrefresh(inferenceWin);
 
   // Initialize state
-  ApplicationState state = {false, false, false, false};
+  ApplicationState state = {0, false, false, false, false};
 
   // Draw initial content for each panel
   drawAggregatorPanel(aggregatorWin, state);

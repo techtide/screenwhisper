@@ -29,4 +29,31 @@ private:
     RawAggregatorFile file_;
 };
 
+class ScreenDataObserver : public RawDataObserver {
+public:
+    explicit ScreenDataObserver() = default;
+    virtual ~ScreenDataObserver() override;
+    virtual void collectData(const RawAggregatorFile& agg) override;
+private:
+    const RawAggregatorFile file_;
+};
+
+class MicrophoneDataObserver : public RawDataObserver {
+public:
+    explicit MicrophoneDataObserver() = default;
+    virtual ~MicrophoneDataObserver() override;
+    virtual void collectData(const RawAggregatorFile& agg) override;
+private:
+    const RawAggregatorFile file_;
+};
+
+class WebDataObserver : public RawDataObserver {
+public:
+    explicit WebDataObserver() = default;
+    virtual ~WebDataObserver() override;
+    virtual void collectData(const RawAggregatorFile& agg) override;
+private:
+    const RawAggregatorFile file_;
+};
+
 #endif // AGGREGATOR_H
