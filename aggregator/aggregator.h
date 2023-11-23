@@ -6,6 +6,7 @@
 #include <X11/Xutil.h>
 #include <memory>
 #include <iostream>
+#include <alsa/asoundlib.h>
 
 // Container file that allows for generic data to be saved
 class RawAggregatorFile
@@ -33,35 +34,41 @@ class RawDataObserver
 {
 public:
   RawDataObserver(const std::string &file_path) : file_(file_path) {}
-  virtual ~RawDataObserver() = default;
   virtual void CollectData() = 0;
 
 protected:
   RawAggregatorFile file_;
 };
 
+// Collect raw screencaps of the display from the root window in X11
 class ScreenDataObserver : public RawDataObserver
 {
 public:
   ScreenDataObserver() : RawDataObserver("screen_data") {}
-  ~ScreenDataObserver() override;
   void CollectData() override;
 
 private:
   std::unique_ptr<Display, decltype(&XCloseDisplay)> display_{XOpenDisplay(nullptr), XCloseDisplay};
   Window root_{DefaultRootWindow(display_.get())};
   XWindowAttributes window_attributes_;
+  ~ScreenDataObserver() {
+    XCloseDisplay(display_.get());
+  }
 };
 
+// Collect the raw microphone audio data in the background
 class MicrophoneDataObserver : public RawDataObserver
 {
 public:
   MicrophoneDataObserver() : RawDataObserver("screen_data") {}
-  ~MicrophoneDataObserver() override;
   void CollectData() override;
 
 private:
-
+  std::unique_ptr<snd_pcm_t> capture_handle_;
+  int capture_frequency_;
+  ~MicrophoneDataObserver() {
+    snd_pcm_close(capture_handle_.get());
+  }
 };
 
 #endif // AGGREGATOR_H
