@@ -3,7 +3,7 @@
 MicrophoneDataObserver::MicrophoneDataObserver() : RawDataObserver("microphone_data")
 {
   // Open the default capture device and store the handle
-  snd_pcm_t *capture_handle;
+  snd_pcm_t *capture_handle = this->capture_handle_;
   int error = snd_pcm_open(&capture_handle, "hw:0,0", SND_PCM_STREAM_CAPTURE, 0);
   if (error < 0)
   {
@@ -20,9 +20,6 @@ MicrophoneDataObserver::MicrophoneDataObserver() : RawDataObserver("microphone_d
     return;
   }
 
-  // Store the capture handle as a class variable
-  this->capture_handle_ = std::make_unique<snd_pcm_t>(capture_handle);
-
   // This should be kept in the .cfg file
   capture_frequency_ = 44100; 
   capture_interval_seconds_ = 10;
@@ -33,7 +30,7 @@ MicrophoneDataObserver::MicrophoneDataObserver() : RawDataObserver("microphone_d
 void MicrophoneDataObserver::CollectData()
 {
   // Start recording
-  int error = snd_pcm_start(capture_handle_.get());
+  int error = snd_pcm_start(capture_handle_);
   if (error < 0)
   {
     std::cout << "Error starting capture: " << snd_strerror(error) << std::endl;
@@ -48,7 +45,7 @@ void MicrophoneDataObserver::CollectData()
     int buffer_size = capture_frequency_ * capture_interval_seconds_ * 2;
     char *buffer = new char[buffer_size];
 
-    frames_read = snd_pcm_readi(capture_handle_.get(), buffer, frames);
+    frames_read = snd_pcm_readi(capture_handle_, buffer, frames);
     if (frames_read < 0)
     {
       std::cerr << "Error reading data: " << snd_strerror(frames_read) << std::endl;

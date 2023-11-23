@@ -46,14 +46,14 @@ class ScreenDataObserver : public RawDataObserver
 public:
   ScreenDataObserver() : RawDataObserver("screen_data") {}
   void CollectData() override;
+  ~ScreenDataObserver() {
+    XCloseDisplay(display_);
+  }
 
 private:
-  std::unique_ptr<Display, decltype(&XCloseDisplay)> display_{XOpenDisplay(nullptr), XCloseDisplay};
-  Window root_{DefaultRootWindow(display_.get())};
+  Display* display_;
+  Window root_{DefaultRootWindow(display_)};
   XWindowAttributes window_attributes_;
-  ~ScreenDataObserver() {
-    XCloseDisplay(display_.get());
-  }
 };
 
 // Collect the raw microphone audio data in the background
@@ -62,14 +62,14 @@ class MicrophoneDataObserver : public RawDataObserver
 public:
   MicrophoneDataObserver() : RawDataObserver("screen_data") {}
   void CollectData() override;
+  ~MicrophoneDataObserver() {
+    snd_pcm_close(capture_handle_);
+  }
 
 private:
-  std::unique_ptr<snd_pcm_t> capture_handle_;
+  snd_pcm_t* capture_handle_;
   int capture_frequency_;
   int capture_interval_seconds_;
-  ~MicrophoneDataObserver() {
-    snd_pcm_close(capture_handle_.get());
-  }
 };
 
 #endif // AGGREGATOR_H

@@ -1,6 +1,11 @@
 #include <iostream>
 #include <ncurses.h>
 #include <libconfig.h++>
+#include <vector>
+
+#include "aggregator/aggregator.h"
+#include "inference/inference.h"
+#include "knowledge/knowledge.h"
 
 struct ApplicationState
 {
@@ -79,8 +84,25 @@ void InitUpdateState() {
   }
 }
 
+// Ingests the state and orchestrates aggregator, inference, and knowledge
+// submodules accordingly.
+void orchestrate(std::vector<ScreenDataObserver> &observers, ApplicationState &state)
+{
+  // Collect data from each observer
+  for (auto &observer : observers)
+  {
+    if (state.collectingData) {
+      observer.CollectData();
+    }
+  }
+}
+
 int main()
 {
+  ScreenDataObserver screen_observer;
+  std::vector<ScreenDataObserver> observerVec;
+  observerVec.push_back(screen_observer);
+
   initscr(); // initialize the library
   noecho();  // don't display input characters
   cbreak();  // disable line buffering
@@ -132,6 +154,7 @@ int main()
     default:
       break;
     }
+    orchestrate(observerVec, state);
     drawAggregatorPanel(aggregatorWin, state);
   }
 

@@ -2,10 +2,11 @@
 
 ScreenDataObserver::ScreenDataObserver() : RawDataObserver("screen_data")
 {
+  display_ = XOpenDisplay(nullptr);
   if (!display_) {
     std::cerr << "Error: Unable to open display." << std::endl;
   }
-  XGetWindowAttributes(display_.get(), root_, &window_attributes_);
+  XGetWindowAttributes(display_, root_, &window_attributes_);
   this->file_.CreateDataSave("");
 }
 
@@ -16,7 +17,7 @@ void ScreenDataObserver::CollectData()
   // fic portion of the screen which will be captured by ScreenDataObserver.
   int width = window_attributes_.width;
   int height = window_attributes_.height;
-  XImage* image = XGetImage(display_.get(), root_, 0, 0, width, height, AllPlanes, ZPixmap);
+  XImage* image = XGetImage(display_, root_, 0, 0, width, height, AllPlanes, ZPixmap);
   if (!image) {
     std::cerr << "Error: Unable to get image." << std::endl;
     return;
