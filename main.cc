@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ncurses.h>
 
-struct ApplicationState 
+struct ApplicationState
 {
   bool collectingData;
   bool screenChecked;
@@ -75,7 +75,7 @@ int main()
   // Create windows for each panel
   WINDOW *aggregatorWin = newwin(7, width / 3, 1, 0);
   WINDOW *knowledgeBaseWin = newwin(height - 8, width / 3, 8, 0);
-  WINDOW *inferenceWin = newwin(height - 1, 2*width / 3, 1, width / 3);
+  WINDOW *inferenceWin = newwin(height - 1, 2 * width / 3, 1, width / 3);
 
   // Refresh windows
   refresh();
@@ -94,14 +94,18 @@ int main()
   int ch;
   while ((ch = getch()) != KEY_F(1))
   {
-    switch (ch) {
+    switch (ch)
+    {
     case 'd':
-      if (state.collectingData) {
+      if (state.collectingData)
+      {
         state.collectingData = false;
         state.screenChecked = false;
         state.microphoneChecked = false;
         state.websiteChecked = false;
-      } else {
+      }
+      else
+      {
         state.collectingData = true;
         enableDataCollection();
       }

@@ -2,58 +2,55 @@
 #define AGGREGATOR_H
 
 #include <string>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <memory>
+#include <iostream>
 
 // Container file that allows for generic data to be saved
-class RawAggregatorFile {
+class RawAggregatorFile
+{
 public:
-    RawAggregatorFile(const std::string& file_path);
+  RawAggregatorFile() : file_path_("temp_file") {}
 
-    // Updates the existing file object contents with the new data
-    template <typename T>
-    void updateDataSave(const T& data);
+  // Constructor that takes in a file path
+  RawAggregatorFile(const std::string &file_path) : file_path_(file_path) {}
 
-    // Save a file of generic type to the specific path 
-    template <typename T>
-    void createDataSave(const T& data);
+  // Updates the existing file object contents with the new data
+  template <typename T>
+  void UpdateDataSave(const T &data);
+
+  // Save a file of generic type to the specific path
+  template <typename T>
+  void CreateDataSave(const T &data);
+
 private:
-    std::string file_path_;
+  std::string file_path_;
 };
 
 // Abstract class to observe raw data from various sources
-class RawDataObserver {
+class RawDataObserver
+{
 public:
-    RawDataObserver(const std::string& file_path);
-    virtual ~RawDataObserver() = default;
-    virtual void collectData(const RawAggregatorFile& agg) = 0;
-private:
-    RawAggregatorFile file_;
+  RawDataObserver(const std::string &file_path) : file_(file_path) {}
+  virtual ~RawDataObserver() = default;
+  virtual void CollectData() = 0;
+
+protected:
+  RawAggregatorFile file_;
 };
 
-class ScreenDataObserver : public RawDataObserver {
+class ScreenDataObserver : public RawDataObserver
+{
 public:
-    explicit ScreenDataObserver() = default;
-    virtual ~ScreenDataObserver() override;
-    virtual void collectData(const RawAggregatorFile& agg) override;
-private:
-    const RawAggregatorFile file_;
-};
+  ScreenDataObserver() : RawDataObserver("screen_data") {}
+  ~ScreenDataObserver() override;
+  void CollectData() override;
 
-class MicrophoneDataObserver : public RawDataObserver {
-public:
-    explicit MicrophoneDataObserver() = default;
-    virtual ~MicrophoneDataObserver() override;
-    virtual void collectData(const RawAggregatorFile& agg) override;
 private:
-    const RawAggregatorFile file_;
-};
-
-class WebDataObserver : public RawDataObserver {
-public:
-    explicit WebDataObserver() = default;
-    virtual ~WebDataObserver() override;
-    virtual void collectData(const RawAggregatorFile& agg) override;
-private:
-    const RawAggregatorFile file_;
+  std::unique_ptr<Display, decltype(&XCloseDisplay)> display_{XOpenDisplay(nullptr), XCloseDisplay};
+  Window root_{DefaultRootWindow(display_.get())};
+  XWindowAttributes window_attributes_;
 };
 
 #endif // AGGREGATOR_H
