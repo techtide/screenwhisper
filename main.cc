@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ncurses.h>
+#include <libconfig.h++>
 
 struct ApplicationState
 {
@@ -9,6 +10,8 @@ struct ApplicationState
   bool websiteChecked;
   int data_collected;
 };
+
+libconfig::Config screenwhisper_user_config_;
 
 // Function to draw the Aggregator panel
 void drawAggregatorPanel(WINDOW *aggregatorWin, const ApplicationState &state)
