@@ -53,4 +53,15 @@ private:
   XWindowAttributes window_attributes_;
 };
 
+class MicrophoneDataObserver : public RawDataObserver
+{
+public:
+  MicrophoneDataObserver() : RawDataObserver("screen_data") {}
+  ~MicrophoneDataObserver() override;
+  void CollectData() override;
+
+private:
+
+};
+
 #endif // AGGREGATOR_H

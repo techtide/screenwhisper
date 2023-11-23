@@ -15,9 +15,14 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBCONFIG REQUIRED libconfig++)
 include_directories(${LIBCONFIG_INCLUDE_DIRS})
 
+# alsa
+find_package(ALSA REQUIRED)                                    
+include_directories(${ALSA_INCLUDE_DIRS})                  
+
 # screenwhisper executable target
 add_executable(screenwhisper main.cc)
 target_link_libraries(screenwhisper ${CURSES_LIBRARIES})
 target_link_libraries(screenwhisper ${LIBCONFIG_LIBRARIES})
+target_link_libraries(screenwhisper ${ALSA_LIBRARIES})
 
 install(TARGETS screenwhisper DESTINATION bin)
