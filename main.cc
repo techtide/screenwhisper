@@ -64,6 +64,19 @@ void enableDataCollection()
   return;
 }
 
+void InitUpdateState() {
+  try {
+    screenwhisper_user_config_.readFile("screenwhisper.cfg");
+  } catch (const libconfig::FileIOException &fioex) {
+    std::cerr << "I/O error while reading the configuration file" << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (const libconfig::ParseException &pex) {
+    std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
+              << " - " << pex.getError() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
 int main()
 {
   initscr(); // initialize the library
@@ -71,6 +84,8 @@ int main()
   cbreak();  // disable line buffering
 
   curs_set(0); // hide the cursor
+
+  InitUpdateState();
 
   int height, width;
   getmaxyx(stdscr, height, width);
@@ -86,7 +101,6 @@ int main()
   wrefresh(knowledgeBaseWin);
   wrefresh(inferenceWin);
 
-  // Initialize state
   ApplicationState state = {0, false, false, false, false};
 
   // Draw initial content for each panel
