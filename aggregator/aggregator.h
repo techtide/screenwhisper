@@ -66,6 +66,7 @@ public:
 private:
   std::unique_ptr<snd_pcm_t> capture_handle_;
   int capture_frequency_;
+  int capture_interval_seconds_;
   ~MicrophoneDataObserver() {
     snd_pcm_close(capture_handle_.get());
   }

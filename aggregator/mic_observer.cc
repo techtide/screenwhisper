@@ -25,6 +25,7 @@ MicrophoneDataObserver::MicrophoneDataObserver() : RawDataObserver("microphone_d
 
   // This should be kept in the .cfg file
   capture_frequency_ = 44100; 
+  capture_interval_seconds_ = 10;
 
   this->file_.CreateDataSave("");
 }
@@ -42,8 +43,9 @@ void MicrophoneDataObserver::CollectData()
   int frames_read;
   while (frames_read % capture_frequency_ != 0)
   {
-    int frames = capture_frequency_ * 10; // Record 10 seconds of audio per run
-    int buffer_size = 441000 * 2;
+    // Record captureInterval seconds of audio per run
+    int frames = capture_frequency_ * capture_interval_seconds_;
+    int buffer_size = capture_frequency_ * capture_interval_seconds_ * 2;
     char *buffer = new char[buffer_size];
 
     frames_read = snd_pcm_readi(capture_handle_.get(), buffer, frames);
