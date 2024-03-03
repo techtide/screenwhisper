@@ -1,3 +1,5 @@
+NOTE: I will first be supporting GNOME Orca (the scriptable screen reader): https://wiki.gnome.org/Projects/Orca
+
 There are five main parts to this system:
 
 1. Raw Data Collection
